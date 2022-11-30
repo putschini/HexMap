@@ -9,6 +9,11 @@
 config_version=4
 
 _global_script_classes=[ {
+"base": "Node",
+"class": "EdgeVertices",
+"language": "GDScript",
+"path": "res://EdgeVertices.gd"
+}, {
 "base": "Reference",
 "class": "HexCell",
 "language": "GDScript",
@@ -40,6 +45,7 @@ _global_script_classes=[ {
 "path": "res://HexMetrics.gd"
 } ]
 _global_script_class_icons={
+"EdgeVertices": "",
 "HexCell": "",
 "HexCoordinate": "",
 "HexDirection": "",
@@ -53,6 +59,10 @@ _global_script_class_icons={
 config/name="Fantasy Civ"
 run/main_scene="res://Control.tscn"
 config/icon="res://icon.png"
+
+[autoload]
+
+Noise="*res://Noise.gd"
 
 [gui]
 

@@ -1,6 +1,5 @@
 class_name HexMetrics
 
-
 ####################### Hexagon Geometry ########################
 #################################################################
 const outer_to_inner := 0.866025404 # sqrt(3) / 2
@@ -101,3 +100,14 @@ static func terrace_lerp_interpolation(var a: Vector3, var b: Vector3, var step:
 static func tearrace_lerp_color_interpolation(var a: Color, var b: Color, var step: int) -> Color:
 	var horizontal_offset = step * horizontal_terrace_step_size
 	return a.linear_interpolate(b, horizontal_offset)
+
+static func terrace_lerp_edge_interpolation(var a: EdgeVertices, var b: EdgeVertices, var step: int) -> EdgeVertices:
+	var ret = EdgeVertices.new(a.v1, b.v1)
+	ret.v1 = terrace_lerp_interpolation(a.v1, b.v1, step)
+	ret.v2 = terrace_lerp_interpolation(a.v2, b.v2, step)
+	ret.v3 = terrace_lerp_interpolation(a.v3, b.v3, step)
+	ret.v4 = terrace_lerp_interpolation(a.v4, b.v4, step)
+	return ret
+
+const cell_perturb_strength := 5.0
+const cell_perturb_elevation_strength := 1.5

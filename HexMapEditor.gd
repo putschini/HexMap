@@ -1,8 +1,5 @@
 extends Control
 
-
-
-
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	pass # Replace with function body.
@@ -10,8 +7,8 @@ func _ready():
 func edit_cell(var cell: HexCell) -> void:
 	cell.color = color
 	if edit_elevation:
-		cell.elevation = elevation_value
-		cell.center.y = cell.elevation * HexMetrics.elevation_height
+#		cell.elevation = elevation_value
+		cell.set_elevation(elevation_value)
 
 var color := Color.white
 
