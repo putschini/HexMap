@@ -111,3 +111,10 @@ static func terrace_lerp_edge_interpolation(var a: EdgeVertices, var b: EdgeVert
 
 const cell_perturb_strength := 5.0
 const cell_perturb_elevation_strength := 1.5
+
+#Cells per chunk
+const chunk_size_x := 5
+const chunk_size_z := 5
+#Number of chunks
+const chunk_count_x := 4
+const chunk_count_z := 3
