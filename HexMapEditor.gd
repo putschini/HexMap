@@ -10,6 +10,12 @@ func edit_cell(var cell: HexCell) -> void:
 			cell.set_color(color)
 		if edit_elevation:
 			cell.set_elevation(elevation_value)
+		if river_edit_value == 2:
+			cell.remove_river()
+
+func edit_cell_drag(var cell: HexCell, var direction: int) -> void:
+	if river_edit_value == 1:
+		cell.set_outgoing_river(direction)
 
 var edit_color := false
 var color := Color.white
@@ -37,7 +43,13 @@ func _on_elevation_value_changed(value):
 func _on_edit_elevation_toggled(button_pressed):
 	edit_elevation = button_pressed
 
-var brush_size := 1
+var brush_size := 0
 
 func _on_brush_size_value_changed(value):
 	brush_size = value
+
+# 0: do nothing, 1: add river, 2: remove river
+var river_edit_value := 0
+
+func _on_river_item_selected(index):
+	river_edit_value = index

@@ -41,20 +41,39 @@ margin_bottom = 45.0
 max_value = 5.0
 rounded = true
 
-[node name="Control3" type="Control" parent="Control2"]
-margin_left = 2.0
-margin_top = 50.0
-margin_right = 44.0
-margin_bottom = 95.0
+[node name="Control3" type="Control" parent="."]
+margin_top = 206.0
+margin_right = 88.0
+margin_bottom = 253.0
 
-[node name="Label" type="Label" parent="Control2/Control3"]
+[node name="RiverSelector" type="ItemList" parent="Control3"]
+margin_left = 1.0
+margin_top = 26.0
+margin_right = 71.0
+margin_bottom = 91.0
+items = [ "None", null, false, "Add", null, false, "Remove", null, false ]
+
+[node name="Label" type="Label" parent="Control3"]
+margin_left = 7.0
+margin_top = 4.0
+margin_right = 60.0
+margin_bottom = 24.0
+text = "Rivers"
+
+[node name="Control4" type="Control" parent="."]
+margin_left = 5.0
+margin_top = 155.0
+margin_right = 47.0
+margin_bottom = 200.0
+
+[node name="Label" type="Label" parent="Control4"]
 margin_left = 3.0
 margin_top = 6.0
 margin_right = 70.0
 margin_bottom = 20.0
 text = "Brush Size"
 
-[node name="BrushSizeSlider" type="HSlider" parent="Control2/Control3"]
+[node name="BrushSizeSlider" type="HSlider" parent="Control4"]
 margin_left = 1.0
 margin_top = 23.0
 margin_right = 70.0
@@ -65,4 +84,5 @@ rounded = true
 [connection signal="item_selected" from="Control/ColorSelector" to="." method="_on_selected_color_change"]
 [connection signal="toggled" from="Control2/ElevationCheckBox" to="." method="_on_edit_elevation_toggled"]
 [connection signal="value_changed" from="Control2/ElevationSlider" to="." method="_on_elevation_value_changed"]
-[connection signal="value_changed" from="Control2/Control3/BrushSizeSlider" to="." method="_on_brush_size_value_changed"]
+[connection signal="item_selected" from="Control3/RiverSelector" to="." method="_on_river_item_selected"]
+[connection signal="value_changed" from="Control4/BrushSizeSlider" to="." method="_on_brush_size_value_changed"]

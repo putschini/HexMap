@@ -1,5 +1,12 @@
 class_name HexMetrics
 
+#Cells per chunk
+const chunk_size_x := 5
+const chunk_size_z := 5
+#Number of chunks
+const chunk_count_x := 4
+const chunk_count_z := 3
+
 ####################### Hexagon Geometry ########################
 #################################################################
 const outer_to_inner := 0.866025404 # sqrt(3) / 2
@@ -8,14 +15,16 @@ const inner_to_outer := 1.0 / outer_to_inner
 const outer_radius = 10.0
 const inner_radius = outer_radius * outer_to_inner 
 
-#	public static Vector3[] corners = {
-#		new Vector3(0f, 0f, outerRadius),
-#		new Vector3(innerRadius, 0f, 0.5f * outerRadius),
-#		new Vector3(innerRadius, 0f, -0.5f * outerRadius),
-#		new Vector3(0f, 0f, -outerRadius),
-#		new Vector3(-innerRadius, 0f, -0.5f * outerRadius),
-#		new Vector3(-innerRadius, 0f, 0.5f * outerRadius)
-#	};
+const cell_perturb_strength := 0.0 #5.0
+const cell_perturb_elevation_strength := 1.5
+
+static func perturb(var position: Vector3) -> Vector3:
+	var pertub = Noise.sample_3d(position)
+	var ret = Vector3()
+	ret.x = position.x + pertub.x * cell_perturb_strength
+	ret.y = position.y
+	ret.z = position.z + pertub.z * cell_perturb_strength
+	return ret
 
 ########################## CORNERS ##############################
 # Z axis is flip from Unity
@@ -26,8 +35,7 @@ const corners := [
 	Vector3(0.0, 0.0, outer_radius),
 	Vector3(-inner_radius, 0.0, 0.5 * outer_radius),
 	Vector3(-inner_radius, 0.0, -0.5 * outer_radius),
-	Vector3(0.0, 0.0, -outer_radius)
-]
+	Vector3(0.0, 0.0, -outer_radius)]
 
 static func get_first_corner( var direction : int ) -> Vector3:
 	return corners[direction]
@@ -44,6 +52,9 @@ static func get_first_solid_corner( var direction : int ) -> Vector3:
 static func get_second_solid_corner( var direction : int ) -> Vector3:
 	return corners[direction + 1] * solid_factor
 
+static func get_solid_middle_corner(var direction: int) -> Vector3:
+	return (corners[direction] + corners[direction+1]) * (solid_factor * 0.5)
+
 static func get_blend_bridge( var direction : int ) -> Vector3:
 	return (corners[direction] + corners[direction + 1]) * blend_factor
 
@@ -55,7 +66,6 @@ static func cell_center_from_offset( var x :int, var z :int ) -> Vector3:
 
 static func cell_coordinate_from_offset( var x : int, var z : int ) -> HexCoordinate:
 	return HexCoordinate.new(x - z / 2, z)
-#	return HexCoordinate.new(Vector3(x - z / 2, 0, z))
 
 static func hexcoord_from_position(var position : Vector3) -> HexCoordinate:
 	var x = position.x / (inner_radius * 2.0)
@@ -107,14 +117,9 @@ static func terrace_lerp_edge_interpolation(var a: EdgeVertices, var b: EdgeVert
 	ret.v2 = terrace_lerp_interpolation(a.v2, b.v2, step)
 	ret.v3 = terrace_lerp_interpolation(a.v3, b.v3, step)
 	ret.v4 = terrace_lerp_interpolation(a.v4, b.v4, step)
+	ret.v5 = terrace_lerp_interpolation(a.v5, b.v5, step)
 	return ret
 
-const cell_perturb_strength := 5.0
-const cell_perturb_elevation_strength := 1.5
 
-#Cells per chunk
-const chunk_size_x := 5
-const chunk_size_z := 5
-#Number of chunks
-const chunk_count_x := 4
-const chunk_count_z := 3
+const river_bed_offset = -1.0
+const river_surface_offset = -0.25
