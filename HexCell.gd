@@ -32,6 +32,7 @@ func set_elevation(var new_elevation: int) -> void:
 		elevation = new_elevation
 		center.y = (elevation * HexMetrics.elevation_height) + ( HexMetrics.cell_perturb_elevation_strength * Noise.sampler.get_noise_3dv(coordinate.xyz()) )
 		update_river_on_elevation_change()
+		update_road_on_elevation_change()
 		needs_update()
 
 func get_edge_type(var direction: int):
@@ -40,12 +41,21 @@ func get_edge_type(var direction: int):
 func get_cell_edge_type(var other: HexCell):
 	return HexEdgeType.get_edge_type( elevation, other.elevation )
 
+func get_elevation_difference(var direction: int) -> int:
+	return int(abs( elevation - neighbors[direction].elevation ))
+
 # Prevent uphill river flow
 func update_river_on_elevation_change() -> void:
 	if has_outgoing_river and elevation < neighbors[outgoing_river].elevation:
 		remove_outgoing_river()
 	if has_incoming_river and elevation > neighbors[incoming_river].elevation:
 		remove_incoming_river()
+
+# Prevent roads up/down hills
+func update_road_on_elevation_change() -> void:
+	for direction in HexDirection.values():
+		if roads[direction] and get_elevation_difference(direction) > 1:
+			set_road(direction, false)
 
 ########################### COLOR ##############################
 var color := Color.white
@@ -70,6 +80,9 @@ func has_river_begin_xor_end() -> bool:
 
 func has_river_through_edge(var direction: int) -> bool:
 	return (has_incoming_river and incoming_river == direction) or (has_outgoing_river and outgoing_river == direction)
+
+func get_river_begin_or_end() -> int:
+	return incoming_river if has_incoming_river else outgoing_river
 
 func remove_outgoing_river() -> void:
 	if has_outgoing_river:
@@ -106,12 +119,13 @@ func set_outgoing_river(var direction: int) -> void:
 	
 	has_outgoing_river = true
 	outgoing_river = direction
-	needs_update_self_only()
+#	needs_update_self_only()
 	
 	neighbor.remove_incoming_river()
 	neighbor.has_incoming_river = true;
 	neighbor.incoming_river = HexDirection.oposite(direction)
-	neighbor.needs_update_self_only()
+#	neighbor.needs_update_self_only()
+	set_road(direction, false)
 
 func river_bed_elevation( ) -> float:
 	return (elevation + HexMetrics.river_bed_offset) * HexMetrics.elevation_height
@@ -119,8 +133,39 @@ func river_bed_elevation( ) -> float:
 func river_surface_elevation( ) -> float:
 	return (elevation + HexMetrics.river_surface_offset) * HexMetrics.elevation_height
 
+########################### ROAD ##############################
+
+var roads : Array
+
+func has_road( ) -> bool:
+	for road in roads:
+		if road:
+			return true
+	return false
+
+func has_road_through_edge(var direction: int) -> bool:
+	return roads[direction]
+
+func set_road(var direction: int, var value: bool) -> void:
+	roads[direction] = value
+	needs_update_self_only()
+	neighbors[direction].roads[HexDirection.oposite(direction)] = value
+	neighbors[direction].needs_update_self_only()
+
+func add_road(var direction: int) -> void:
+	if not roads[direction] and not has_river_through_edge(direction) and get_elevation_difference(direction) <= 1:
+		set_road(direction, true)
+
+func remove_roads( ) -> void:
+	for direction in HexDirection.values():
+		if roads[direction]:
+			set_road(direction, false)
+
 func _init(var coord: HexCoordinate, var center_vec: Vector3):
 	center = center_vec
 	coordinate = coord
 	neighbors.resize( HexDirection.values().size() )
+	roads.resize( HexDirection.values().size() )
+	for i in HexDirection.values():
+		roads[i] = false
 	set_elevation(0)

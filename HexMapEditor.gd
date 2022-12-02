@@ -12,10 +12,14 @@ func edit_cell(var cell: HexCell) -> void:
 			cell.set_elevation(elevation_value)
 		if river_edit_value == 2:
 			cell.remove_river()
+		if road_edit_value == 2:
+			cell.remove_roads()
 
 func edit_cell_drag(var cell: HexCell, var direction: int) -> void:
 	if river_edit_value == 1:
 		cell.set_outgoing_river(direction)
+	elif road_edit_value == 1:
+		cell.add_road(direction)
 
 var edit_color := false
 var color := Color.white
@@ -53,3 +57,9 @@ var river_edit_value := 0
 
 func _on_river_item_selected(index):
 	river_edit_value = index
+
+# 0: do nothing, 1: add river, 2: remove river
+var road_edit_value := 0
+
+func _on_road_item_selected(index):
+	road_edit_value = index

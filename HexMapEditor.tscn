@@ -60,6 +60,26 @@ margin_right = 60.0
 margin_bottom = 24.0
 text = "Rivers"
 
+[node name="Control5" type="Control" parent="."]
+margin_left = 1.0
+margin_top = 303.0
+margin_right = 89.0
+margin_bottom = 350.0
+
+[node name="RoadSelector" type="ItemList" parent="Control5"]
+margin_left = 1.0
+margin_top = 26.0
+margin_right = 71.0
+margin_bottom = 91.0
+items = [ "None", null, false, "Add", null, false, "Remove", null, false ]
+
+[node name="Label" type="Label" parent="Control5"]
+margin_left = 7.0
+margin_top = 4.0
+margin_right = 60.0
+margin_bottom = 24.0
+text = "Roads"
+
 [node name="Control4" type="Control" parent="."]
 margin_left = 5.0
 margin_top = 155.0
@@ -85,4 +105,5 @@ rounded = true
 [connection signal="toggled" from="Control2/ElevationCheckBox" to="." method="_on_edit_elevation_toggled"]
 [connection signal="value_changed" from="Control2/ElevationSlider" to="." method="_on_elevation_value_changed"]
 [connection signal="item_selected" from="Control3/RiverSelector" to="." method="_on_river_item_selected"]
+[connection signal="item_selected" from="Control5/RoadSelector" to="." method="_on_road_item_selected"]
 [connection signal="value_changed" from="Control4/BrushSizeSlider" to="." method="_on_brush_size_value_changed"]
