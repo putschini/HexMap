@@ -10,6 +10,8 @@ func edit_cell(var cell: HexCell) -> void:
 			cell.set_color(color)
 		if edit_elevation:
 			cell.set_elevation(elevation_value)
+		if edit_wall:
+			cell.set_walled(wall_value)
 		if river_edit_value == 2:
 			cell.remove_river()
 		if road_edit_value == 2:
@@ -63,3 +65,18 @@ var road_edit_value := 0
 
 func _on_road_item_selected(index):
 	road_edit_value = index
+
+var edit_wall := false
+var wall_value := false
+
+func _on_walled_item_selected(index):
+	match index:
+		0: 
+			edit_wall = false
+		1:
+			edit_wall = true
+			wall_value = true
+		2:
+			edit_wall = false
+			wall_value = false
+

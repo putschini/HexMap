@@ -161,6 +161,16 @@ func remove_roads( ) -> void:
 		if roads[direction]:
 			set_road(direction, false)
 
+########################### WALL ##############################
+
+var walled := false
+
+func set_walled(var new_walled: bool) -> void:
+	if walled != new_walled:
+		walled = new_walled
+		needs_update()
+		print("WALLED")
+
 func _init(var coord: HexCoordinate, var center_vec: Vector3):
 	center = center_vec
 	coordinate = coord

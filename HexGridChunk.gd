@@ -12,6 +12,8 @@ onready var terrain: HexMesh = $TerrainMesh
 onready var river: HexMesh = $RiverMesh
 onready var road: HexMesh = $RoadMesh
 
+onready var feature_manager := $FeatureManager
+
 var cells := Array()
 
 var needs_update := true
@@ -52,6 +54,8 @@ func commit_mesh() -> void:
 	terrain.commit_mesh()
 	river.commit_mesh()
 	road.commit_mesh()
+	
+	feature_manager.commit_mesh()
 
 func triangulate( ) -> void:
 	for cell in cells:
@@ -91,17 +95,22 @@ func triangulate_connection( var cell : HexCell, var direction : int, var edge :
 	var blend_bridge_offset = HexMetrics.get_blend_bridge(direction)
 	blend_bridge_offset.y = neighbor.center.y - cell.center.y
 	var neighbor_edge = EdgeVertices.new(edge.v1 + blend_bridge_offset, edge.v5 + blend_bridge_offset)
+	
+	var has_road = cell.has_road_through_edge(direction)
+	var has_river = cell.has_river_through_edge(direction)
 
-	if cell.has_river_through_edge(direction):
+	if has_river:
 		neighbor_edge.v3.y = neighbor.river_bed_elevation()
 		var reversed = cell.has_incoming_river and cell.incoming_river == direction
 		triangulate_river_quad2(edge.v1, edge.v4, cell.river_surface_elevation(), neighbor_edge.v1, neighbor_edge.v4, neighbor.river_surface_elevation(), 0.8, reversed)
 
 	# Rectangle blending region between hexagons
 	if cell.get_edge_type(direction) == HexEdgeType.Slop:
-		triangulate_slop_edge(edge, cell, neighbor_edge, neighbor, cell.has_road_through_edge(direction)) 
+		triangulate_slop_edge(edge, cell, neighbor_edge, neighbor, has_road) 
 	else:
-		triangulate_edge_strip(edge, cell.color, neighbor_edge, neighbor.color, cell.has_road_through_edge(direction))
+		triangulate_edge_strip(edge, cell.color, neighbor_edge, neighbor.color, has_road)
+
+	feature_manager.add_wall(edge, cell, neighbor_edge, neighbor, has_road, has_river )
 
 	var next_neighbor = cell.neighbors[HexDirection.next(direction)]
 	# Only add the triangle connection in two direction, to not produce overlaping triangles
@@ -172,6 +181,8 @@ func triangulate_corner(var bottom_edge: Vector3, var bottom_cell: HexCell, var 
 		else:
 			terrain.add_triangle( bottom_edge, left_edge, right_edge )
 			terrain.add_triangle_color( bottom_cell.color, left_cell.color, right_cell.color )
+
+	feature_manager.add_wall_corner(bottom_edge, bottom_cell, left_edge, left_cell, right_edge, right_cell)
 
 #Triangulate corner between cells with 1 elevation difference
 #Starts from the triangule in the top/bottom corner

@@ -101,9 +101,30 @@ margin_bottom = 45.0
 max_value = 5.0
 rounded = true
 
+[node name="Control6" type="Control" parent="."]
+margin_top = 400.0
+margin_right = 40.0
+margin_bottom = 440.0
+
+[node name="Label" type="Label" parent="Control6"]
+margin_left = 6.0
+margin_top = 4.0
+margin_right = 64.0
+margin_bottom = 35.0
+text = "Walled
+"
+
+[node name="ItemList" type="ItemList" parent="Control6"]
+margin_left = 1.0
+margin_top = 23.0
+margin_right = 75.0
+margin_bottom = 86.0
+items = [ "---", null, false, "add", null, false, "remove", null, false ]
+
 [connection signal="item_selected" from="Control/ColorSelector" to="." method="_on_selected_color_change"]
 [connection signal="toggled" from="Control2/ElevationCheckBox" to="." method="_on_edit_elevation_toggled"]
 [connection signal="value_changed" from="Control2/ElevationSlider" to="." method="_on_elevation_value_changed"]
 [connection signal="item_selected" from="Control3/RiverSelector" to="." method="_on_river_item_selected"]
 [connection signal="item_selected" from="Control5/RoadSelector" to="." method="_on_road_item_selected"]
 [connection signal="value_changed" from="Control4/BrushSizeSlider" to="." method="_on_brush_size_value_changed"]
+[connection signal="item_selected" from="Control6/ItemList" to="." method="_on_walled_item_selected"]

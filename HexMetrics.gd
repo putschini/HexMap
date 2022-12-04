@@ -123,3 +123,22 @@ static func terrace_lerp_edge_interpolation(var a: EdgeVertices, var b: EdgeVert
 
 const river_bed_offset = -1.0
 const river_surface_offset = -0.25
+
+const wall_height = 5.0
+const wall_thickness = 0.75
+const wall_elevation_offset = vertical_terrace_step_size
+
+static func wall_thickness_offset(var near: Vector3, var far: Vector3) -> Vector3:
+	var offset := Vector3()
+	offset.x = far.x - near.x
+	offset.y = 0
+	offset.z = far.z - near.z
+	return offset.normalized() * (wall_thickness * 0.5)
+
+static func wall_lerp( var near: Vector3, var far: Vector3 ) -> Vector3:
+	var result = near
+	result.x += (far.x - near.x) * 0.5
+	result.z += (far.z - near.z) * 0.5
+	var y_offset = wall_elevation_offset if near.y < far.y else (1 - wall_elevation_offset)
+	result.y += (far.y - near.y) * y_offset
+	return result

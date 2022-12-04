@@ -65,6 +65,15 @@ func add_quad( var v1 : Vector3, var  v2 : Vector3, var  v3 : Vector3, var  v4 :
 	vertices.push_back(HexMetrics.perturb(v3));
 	vertices.push_back(HexMetrics.perturb(v4));
 
+func add_quad_unperturbed( var v1 : Vector3, var  v2 : Vector3, var  v3 : Vector3, var  v4 : Vector3 ) -> void:
+	vertices.push_back(v1);
+	vertices.push_back(v3);
+	vertices.push_back(v2);
+
+	vertices.push_back(v2);
+	vertices.push_back(v3);
+	vertices.push_back(v4);
+
 func add_quad_color( var c1 : Color, var c2 : Color, var c3 : Color, var c4 : Color ) -> void:
 	colors.push_back( c1 )
 	colors.push_back( c3 )
