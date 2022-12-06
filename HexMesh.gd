@@ -33,6 +33,10 @@ func setup(var colider: bool, var color: bool, uvs: bool, var shadows: bool ) ->
 func set_material(var new_material: ShaderMaterial) -> void:
 	material = new_material
 
+func set_next_material(var next_material: ShaderMaterial) -> void:
+	material.next_pass = next_material
+#	material.next_pass(next_material)
+
 func add_triangle( var v1 : Vector3, var  v2 : Vector3, var  v3 : Vector3 ) -> void:
 	vertices.push_back(HexMetrics.perturb(v1));
 	vertices.push_back(HexMetrics.perturb(v2));

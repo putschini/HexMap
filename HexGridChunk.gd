@@ -7,6 +7,7 @@ class_name HexGridChunk
 onready var test_material: ShaderMaterial = preload("res://test_shader.material")
 onready var river_material: ShaderMaterial = preload("res://River.material")
 onready var road_material : ShaderMaterial = preload("res://Road.material")
+onready var grid_material : ShaderMaterial = preload("res://Grid.material")
 #var hex_mesh
 onready var terrain: HexMesh = $TerrainMesh
 onready var river: HexMesh = $RiverMesh
@@ -25,6 +26,7 @@ func _init():
 # Called when the node enters the scene tree for the first time.
 func _ready():
 	terrain.setup(true, true, false, true)
+	terrain.set_next_material(grid_material)
 	river.setup(false, false, true, false)
 	river.set_material(river_material)
 	road.setup(false, false, true, false)
@@ -44,7 +46,8 @@ func update() -> void:
 		for cell in cells:
 			var label := Label3D.new()
 			label.translation = cell.center + Vector3(0, 2, 0)
-			label.text = cell.coordinate.to_string()
+			#label.text = cell.coordinate.to_string()
+			label.text = str(cell.distance)
 			label.scale = Vector3(8,8,8)
 			label.modulate = Color.black
 			label.billboard = true
@@ -441,6 +444,7 @@ func triangulate_road_edge(var center: Vector3, var middle_left: Vector3, var mi
 	road.add_triangle(center, middle_left, middle_right)
 	road.add_triangle_uv(Vector2(1.0, 0.0), Vector2(0.0, 0.0), Vector2(0.0, 0.0))
 
+#TODO: move to hexmetrics
 func get_road_interpolators(var cell: HexCell, var direction: int) -> Vector2:
 	var interpolators = Vector2()
 	if cell.has_road_through_edge(direction):

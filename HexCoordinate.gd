@@ -16,6 +16,10 @@ func xz() -> Vector2:
 func xyz() -> Vector3:
 	return Vector3(x, y, z)
 
+func distance_to(var other: HexCoordinate) -> int:
+	return ((x - other.x if x > other.x else other.x - x) + (y - other.y if y > other.y else other.y - y) + (z - other.z if z > other.z else other.z - z)) / 2
+
+
 func to_string( ) -> String:
 #	return "(" + str(x) + "," + str(z) + ")"
 	return "(" + str(x) + "," + str(y) + "," + str(z) + ")"

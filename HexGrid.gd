@@ -82,3 +82,33 @@ func get_cell(var coordinate: HexCoordinate) -> HexCell:
 #	var index = cell_local_x + cell_local_z * HexMetrics.chunk_size_x + floor(coordinate.z / 2)
 #	return chunks[chunk_x + chunk_z * HexMetrics.chunk_count_x].cells[index]
 
+func find_distances_to(var to: HexCell ) -> void:
+	search(to)
+
+var max_distance = 9999999999
+
+func search(var initial: HexCell) -> void:
+	for cell in cells:
+		cell.distance = max_distance
+		cell.needs_update()
+	var frontier := Array()
+	initial.distance = 0
+	frontier.push_back(initial)
+	while(not frontier.empty()):
+		var current =  frontier.pop_front()
+		for direction in HexDirection.values():
+			var neighbor = current.get_neighbor(direction)
+			if neighbor == null:
+				continue
+			if HexEdgeType.get_edge_type(current.elevation, neighbor.elevation) == HexEdgeType.Cliff:
+				continue
+			if current.walled != neighbor.walled and not current.has_road_through_edge(direction):
+				continue
+
+			var new_distance = current.distance + current.get_movement_cost(direction)
+			if new_distance < neighbor.distance:
+				neighbor.distance = new_distance
+				frontier.push_back(neighbor)
+		frontier.sort_custom(HexCell, "sort_distance")
+				
+

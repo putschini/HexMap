@@ -169,7 +169,17 @@ func set_walled(var new_walled: bool) -> void:
 	if walled != new_walled:
 		walled = new_walled
 		needs_update()
-		print("WALLED")
+
+var distance := 0
+
+func get_movement_cost(var direction: int) -> int:
+	if has_road_through_edge(direction):
+		return 1
+	else:
+		if HexEdgeType.get_edge_type(elevation, neighbors[direction].elevation) == HexEdgeType.Flat:
+			return 5
+		else:
+			return 10
 
 func _init(var coord: HexCoordinate, var center_vec: Vector3):
 	center = center_vec
@@ -179,3 +189,6 @@ func _init(var coord: HexCoordinate, var center_vec: Vector3):
 	for i in HexDirection.values():
 		roads[i] = false
 	set_elevation(0)
+
+static func sort_distance(var c1: HexCell, var c2: HexCell ) -> bool:
+	return c1.distance < c2.distance

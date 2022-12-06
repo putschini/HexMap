@@ -37,8 +37,12 @@ func _input(event):
 		if not intersection.empty():
 			var coordinates = HexMetrics.hexcoord_from_position(intersection.position)
 			var cell = grid.get_cell(coordinates)
-			edit_cells(cell)
-		is_pressed = true
+#			print("CELL FOUND")
+			grid.find_distances_to(cell)
+			grid.update()
+
+#			edit_cells(cell)
+#		is_pressed = true
 	elif event.is_action_released("mouse_left_click"):
 		last_edited_cell = null
 		is_pressed = false
