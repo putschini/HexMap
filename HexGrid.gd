@@ -89,7 +89,7 @@ var max_distance = 9999999999
 
 func search(var initial: HexCell) -> void:
 	for cell in cells:
-		cell.distance = max_distance
+		cell.distance = cell.distance_to(initial.coordinate)
 		cell.needs_update()
 	var frontier := Array()
 	initial.distance = 0
@@ -108,6 +108,48 @@ func search(var initial: HexCell) -> void:
 			var new_distance = current.distance + current.get_movement_cost(direction)
 			if new_distance < neighbor.distance:
 				neighbor.distance = new_distance
+				frontier.push_back(neighbor)
+		frontier.sort_custom(HexCell, "sort_distance")
+				
+
+func find_path(var from: HexCell, var to: HexCell) -> void:
+	for cell in cells:
+		cell.distance = cell.coordinate.distance_to(from.coordinate) * 5 + 1
+		cell.path_from = null
+		cell.to_cell = to
+		cell.disable_highlight()
+		cell.needs_update()
+	
+	from.enable_highlight(Color.blue)
+	to.enable_highlight(Color.red)
+	var frontier := Array()
+	from.distance = 0
+	frontier.push_back(from)
+	while(not frontier.empty()):
+		var current =  frontier.pop_front()
+		if current == to:
+			var prev = current.path_from
+			while prev != null:
+				if prev == from:
+					break
+				if  prev == to:
+					continue
+				prev.enable_highlight(Color.yellow)
+				prev = prev.path_from
+			break
+		for direction in HexDirection.values():
+			var neighbor = current.get_neighbor(direction)
+			if neighbor == null:
+				continue
+			if HexEdgeType.get_edge_type(current.elevation, neighbor.elevation) == HexEdgeType.Cliff:
+				continue
+			if current.walled != neighbor.walled and not current.has_road_through_edge(direction):
+				continue
+
+			var new_distance = current.distance + current.get_movement_cost(direction)
+			if new_distance < neighbor.distance:
+				neighbor.distance = new_distance
+				neighbor.path_from = current
 				frontier.push_back(neighbor)
 		frontier.sort_custom(HexCell, "sort_distance")
 				

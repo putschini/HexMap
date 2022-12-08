@@ -8,6 +8,8 @@ onready var test_material: ShaderMaterial = preload("res://test_shader.material"
 onready var river_material: ShaderMaterial = preload("res://River.material")
 onready var road_material : ShaderMaterial = preload("res://Road.material")
 onready var grid_material : ShaderMaterial = preload("res://Grid.material")
+
+onready var highlight_mesh := preload("res://CellHighlight.tscn")
 #var hex_mesh
 onready var terrain: HexMesh = $TerrainMesh
 onready var river: HexMesh = $RiverMesh
@@ -48,10 +50,16 @@ func update() -> void:
 			label.translation = cell.center + Vector3(0, 2, 0)
 			#label.text = cell.coordinate.to_string()
 			label.text = str(cell.distance)
-			label.scale = Vector3(8,8,8)
+			label.scale = Vector3(18,18,18)
 			label.modulate = Color.black
 			label.billboard = true
 			$Labels.add_child(label)
+			if cell.highlight_enabled:
+				var highlight := highlight_mesh.instance()
+				highlight.translation = cell.center + Vector3(0, 0.5, 0)
+				highlight.scale = Vector3( 10, 10, 10 )
+				highlight.set_outline_color(cell.highlight_color)
+				$Labels.add_child(highlight)
 
 func commit_mesh() -> void:
 	terrain.commit_mesh()

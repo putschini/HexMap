@@ -171,6 +171,8 @@ func set_walled(var new_walled: bool) -> void:
 		needs_update()
 
 var distance := 0
+var to_cell
+var path_from
 
 func get_movement_cost(var direction: int) -> int:
 	if has_road_through_edge(direction):
@@ -180,6 +182,16 @@ func get_movement_cost(var direction: int) -> int:
 			return 5
 		else:
 			return 10
+
+var highlight_enabled := false
+var highlight_color : Color
+
+func enable_highlight(var color: Color) -> void:
+	highlight_enabled = true
+	highlight_color = color
+
+func disable_highlight( ) -> void:
+	highlight_enabled = false
 
 func _init(var coord: HexCoordinate, var center_vec: Vector3):
 	center = center_vec
@@ -191,4 +203,4 @@ func _init(var coord: HexCoordinate, var center_vec: Vector3):
 	set_elevation(0)
 
 static func sort_distance(var c1: HexCell, var c2: HexCell ) -> bool:
-	return c1.distance < c2.distance
+	return c1.distance + c1.coordinate.distance_to(c1.to_cell.coordinate) * 5 < c2.distance + c2.coordinate.distance_to(c2.to_cell.coordinate) * 5

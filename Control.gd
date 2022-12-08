@@ -29,6 +29,8 @@ func validate_drag(var current_cell: HexCell) -> void:
 			return
 	drag_direction = -1
 
+var old_cell
+
 func _input(event):
 	if event.is_action_pressed("mouse_left_click"):
 		var ray_begin = $Camera.camera.project_ray_origin( event.position )
@@ -37,10 +39,13 @@ func _input(event):
 		if not intersection.empty():
 			var coordinates = HexMetrics.hexcoord_from_position(intersection.position)
 			var cell = grid.get_cell(coordinates)
-#			print("CELL FOUND")
-			grid.find_distances_to(cell)
+#			cell.enable_highlight(Color.blue)
+			print("CELL FOUND")
+			if old_cell != null and cell != old_cell:
+				grid.find_path( old_cell, cell )
+			old_cell = cell
+			#grid.find_distances_to(cell)
 			grid.update()
-
 #			edit_cells(cell)
 #		is_pressed = true
 	elif event.is_action_released("mouse_left_click"):

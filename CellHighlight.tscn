@@ -1,0 +1,53 @@
+[gd_scene load_steps=6 format=2]
+
+[ext_resource path="res://Textures/cell-outline.png" type="Texture" id=1]
+[ext_resource path="res://CellHighlight.gd" type="Script" id=2]
+
+[sub_resource type="Shader" id=3]
+code = "shader_type spatial;
+
+render_mode world_vertex_coords;
+
+uniform sampler2D grid_texture;
+
+uniform vec4 outline_color : hint_color;
+
+varying vec2 vec;
+
+void vertex()
+{
+//	color1 = texture(terrain_textures, vec3(VERTEX.x, VERTEX.z, UV.x)).rgb;
+//	color2 = texture(terrain_textures, vec3(VERTEX.x, VERTEX.z, UV.y)).rgb;
+//	color3 = texture(terrain_textures, vec3(VERTEX.x, VERTEX.z, UV2.x)).rgb;
+//	vec = vec2(VERTEX.x, VERTEX.z) * 0.01; 10.0
+//	vec = vec2( VERTEX.z * 1f / (4.0 * 8.66025404), VERTEX.x * 1f / (3.56 * 8.66025404) );
+	vec = vec2( VERTEX.x * 0.08, VERTEX.z * 0.08 );
+	
+//	vec = VERTEX.xz * 0.1;
+}
+
+void fragment()
+{
+//	vec2 vec = vec2( VERTEX.x * 1f / (4f * 8.66025404), VERTEX.z * 1f / (2f * 15.0) );
+	//vec3 grid = texture(grid_texture, vec).rgb;
+	float alpha = texture(grid_texture, vec2(UV.x, UV.y)).a;
+	ALBEDO = outline_color.rgb;
+//	ALBEDO = ALBEDO.rgb * alpha; // vec3(1.0,1.0,1.0) ;//COLOR.rgb * grid;
+	ALPHA = alpha;
+//	ALPHA = 1f - ALBEDO.r; // only grid pixels are diferent than white
+}"
+
+[sub_resource type="ShaderMaterial" id=4]
+resource_local_to_scene = true
+render_priority = 30
+shader = SubResource( 3 )
+shader_param/outline_color = Color( 0, 0, 0, 1 )
+shader_param/grid_texture = ExtResource( 1 )
+
+[sub_resource type="PlaneMesh" id=2]
+resource_local_to_scene = true
+material = SubResource( 4 )
+
+[node name="CellHighlight" type="MeshInstance"]
+mesh = SubResource( 2 )
+script = ExtResource( 2 )
