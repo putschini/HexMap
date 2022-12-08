@@ -170,7 +170,10 @@ func set_walled(var new_walled: bool) -> void:
 		walled = new_walled
 		needs_update()
 
+var unit
+
 var distance := 0
+var turn := 0
 var to_cell
 var path_from
 
@@ -189,6 +192,7 @@ var highlight_color : Color
 func enable_highlight(var color: Color) -> void:
 	highlight_enabled = true
 	highlight_color = color
+	needs_update_self_only()
 
 func disable_highlight( ) -> void:
 	highlight_enabled = false

@@ -49,7 +49,7 @@ func update() -> void:
 			var label := Label3D.new()
 			label.translation = cell.center + Vector3(0, 2, 0)
 			#label.text = cell.coordinate.to_string()
-			label.text = str(cell.distance)
+			label.text = str(cell.turn)
 			label.scale = Vector3(18,18,18)
 			label.modulate = Color.black
 			label.billboard = true

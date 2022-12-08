@@ -4,3 +4,5 @@
 
 [node name="HexGrid" type="Spatial"]
 script = ExtResource( 1 )
+
+[node name="Units" type="Node" parent="."]

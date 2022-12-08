@@ -1,6 +1,8 @@
 tool
 extends Spatial
 
+onready var units_node = $Units
+
 var grid_chunk_scene := preload("res://HexGridChunk.tscn")
 
 var cell_count_x := HexMetrics.chunk_count_x * HexMetrics.chunk_size_x
@@ -9,6 +11,26 @@ var cell_count_z := HexMetrics.chunk_count_z * HexMetrics.chunk_size_z
 var chunks := Array()
 
 var cells := Array()
+
+var units := Array()
+
+func add_unit(var cell: HexCell, var unit: Unit):
+	cell.unit = unit
+	unit.cell = cell
+	unit.translation = cell.center
+	units.push_back(unit)
+	units_node.add_child(unit)
+
+func move_unit(var initial: HexCell, var destination: HexCell) -> bool:
+	var unit = initial.unit
+	var path = find_path(initial, destination, unit.speed)
+	if not path.empty():
+		unit.path = path
+		initial.unit = null
+		destination.unit = unit
+		unit.cell = destination
+		return true
+	return false
 
 func _ready():
 	create_chunks()
@@ -67,7 +89,7 @@ func add_cell_to_chunk(var x: int, var z: int, var cell: HexCell) -> void:
 	var cell_local_z = z - chunk_z * HexMetrics.chunk_size_z
 	chunk.add_cell(cell_local_x + cell_local_z * HexMetrics.chunk_size_x, cell)
 
-func get_cell(var coordinate: HexCoordinate) -> HexCell:	
+func get_cell(var coordinate: HexCoordinate) -> HexCell:
 	var z = coordinate.z
 	var x = coordinate.x + z / 2
 	if z < 0 || z >= cell_count_z || x < 0 || x >= cell_count_x:
@@ -82,75 +104,55 @@ func get_cell(var coordinate: HexCoordinate) -> HexCell:
 #	var index = cell_local_x + cell_local_z * HexMetrics.chunk_size_x + floor(coordinate.z / 2)
 #	return chunks[chunk_x + chunk_z * HexMetrics.chunk_count_x].cells[index]
 
-func find_distances_to(var to: HexCell ) -> void:
-	search(to)
-
-var max_distance = 9999999999
-
-func search(var initial: HexCell) -> void:
-	for cell in cells:
-		cell.distance = cell.distance_to(initial.coordinate)
-		cell.needs_update()
-	var frontier := Array()
-	initial.distance = 0
-	frontier.push_back(initial)
-	while(not frontier.empty()):
-		var current =  frontier.pop_front()
-		for direction in HexDirection.values():
-			var neighbor = current.get_neighbor(direction)
-			if neighbor == null:
-				continue
-			if HexEdgeType.get_edge_type(current.elevation, neighbor.elevation) == HexEdgeType.Cliff:
-				continue
-			if current.walled != neighbor.walled and not current.has_road_through_edge(direction):
-				continue
-
-			var new_distance = current.distance + current.get_movement_cost(direction)
-			if new_distance < neighbor.distance:
-				neighbor.distance = new_distance
-				frontier.push_back(neighbor)
-		frontier.sort_custom(HexCell, "sort_distance")
-				
-
-func find_path(var from: HexCell, var to: HexCell) -> void:
+func find_path(var from: HexCell, var to: HexCell, var speed: int) -> Array:
 	for cell in cells:
 		cell.distance = cell.coordinate.distance_to(from.coordinate) * 5 + 1
 		cell.path_from = null
 		cell.to_cell = to
 		cell.disable_highlight()
 		cell.needs_update()
-	
+
 	from.enable_highlight(Color.blue)
 	to.enable_highlight(Color.red)
 	var frontier := Array()
 	from.distance = 0
 	frontier.push_back(from)
+	var turn = 0
+	var last_turn_distance = 0
+
+	var result = Array()
 	while(not frontier.empty()):
 		var current =  frontier.pop_front()
 		if current == to:
-			var prev = current.path_from
-			while prev != null:
-				if prev == from:
+			result.push_front(to)
+			current = current.path_from
+			while current != null:
+				if current == from:
 					break
-				if  prev == to:
+				if  current == to:
 					continue
-				prev.enable_highlight(Color.yellow)
-				prev = prev.path_from
+				current.enable_highlight(Color.yellow + Color(current.turn * 0.2, current.turn * 0.2, current.turn * 0.2) )
+				result.push_front(current)
+				current = current.path_from
 			break
 		for direction in HexDirection.values():
 			var neighbor = current.get_neighbor(direction)
-			if neighbor == null:
+			if neighbor == null or neighbor.unit != null:
 				continue
 			if HexEdgeType.get_edge_type(current.elevation, neighbor.elevation) == HexEdgeType.Cliff:
 				continue
 			if current.walled != neighbor.walled and not current.has_road_through_edge(direction):
 				continue
-
-			var new_distance = current.distance + current.get_movement_cost(direction)
+			var movement_cost = current.get_movement_cost(direction)
+			var new_distance = current.distance + movement_cost
+			if last_turn_distance + speed < new_distance:
+				turn += 1
+				last_turn_distance = current.distance
 			if new_distance < neighbor.distance:
 				neighbor.distance = new_distance
+				neighbor.turn = turn
 				neighbor.path_from = current
 				frontier.push_back(neighbor)
 		frontier.sort_custom(HexCell, "sort_distance")
-				
+	return result
 

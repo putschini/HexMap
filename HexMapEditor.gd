@@ -4,6 +4,11 @@ extends Control
 func _ready():
 	pass # Replace with function body.
 
+var edit_enabled := false
+
+func _on_edit_toggled(button_pressed):
+	edit_enabled = button_pressed
+
 func edit_cell(var cell: HexCell) -> void:
 	if cell:
 		if edit_color:

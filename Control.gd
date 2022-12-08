@@ -3,6 +3,11 @@ extends Spatial
 onready var grid = $HexGrid
 onready var map_editor = $HexMapEditor
 
+var test_unit := preload("res://TestUnit.tscn")
+
+func _ready():
+	grid.add_unit(grid.get_cell(HexCoordinate.new(1,1)), test_unit.instance())
+
 var last_edited_cell
 var is_pressed := false
 var drag_direction := -1
@@ -29,56 +34,54 @@ func validate_drag(var current_cell: HexCell) -> void:
 			return
 	drag_direction = -1
 
-var old_cell
+var selected_cell : HexCell
+var last_searched : HexCell
+
+func get_cell_under_cursor(var cursor_position) -> HexCell:
+	var ray_begin = $Camera.camera.project_ray_origin( cursor_position )
+	var ray_end = ray_begin + $Camera.camera.project_ray_normal( cursor_position ) * 200
+	var intersection = get_world().direct_space_state.intersect_ray(ray_begin, ray_end)
+	if not intersection.empty():
+		var coordinates = HexMetrics.hexcoord_from_position(intersection.position)
+		return grid.get_cell(coordinates)
+	return null
 
 func _input(event):
 	if event.is_action_pressed("mouse_left_click"):
-		var ray_begin = $Camera.camera.project_ray_origin( event.position )
-		var ray_end = ray_begin + $Camera.camera.project_ray_normal( event.position ) * 200
-		var intersection = get_world().direct_space_state.intersect_ray(ray_begin, ray_end)
-		if not intersection.empty():
-			var coordinates = HexMetrics.hexcoord_from_position(intersection.position)
-			var cell = grid.get_cell(coordinates)
-#			cell.enable_highlight(Color.blue)
-			print("CELL FOUND")
-			if old_cell != null and cell != old_cell:
-				grid.find_path( old_cell, cell )
-			old_cell = cell
-			#grid.find_distances_to(cell)
+		var cell = get_cell_under_cursor( event.position )
+		if cell != null:
+			if map_editor.edit_enabled:
+				edit_cells(cell)
+			else:
+				cell.enable_highlight(Color.green)
+				if selected_cell == cell:
+					selected_cell = null
+				elif selected_cell != null:
+					if selected_cell.unit != null and cell.unit == null:
+						if not grid.move_unit(selected_cell, cell):
+							print("Notice: Path Not found")
+					else:
+						grid.find_path( selected_cell, cell, 14 )
+				else:
+					selected_cell = cell
 			grid.update()
-#			edit_cells(cell)
-#		is_pressed = true
+		is_pressed = true
 	elif event.is_action_released("mouse_left_click"):
 		last_edited_cell = null
 		is_pressed = false
-	elif is_pressed and event is InputEventMouseMotion:
-		var ray_begin = $Camera.camera.project_ray_origin( event.position )
-		var ray_end = ray_begin + $Camera.camera.project_ray_normal( event.position ) * 200
-		var intersection = get_world().direct_space_state.intersect_ray(ray_begin, ray_end)
-		if not intersection.empty():
-			var coordinates = HexMetrics.hexcoord_from_position(intersection.position)
-			var cell = grid.get_cell(coordinates)
-			if cell != last_edited_cell:
+	elif (is_pressed or selected_cell) and event is InputEventMouseMotion:
+		if is_pressed and map_editor.edit_enabled:
+			var cell = get_cell_under_cursor( event.position )
+			if cell != null and cell != last_edited_cell:
 				validate_drag(cell)
 				if drag_direction > -1:
 					map_editor.edit_cell_drag(last_edited_cell, drag_direction)
-				edit_cells(cell)
-
-#			if cell != last_edited_cell:
-#				last_edited_cell = cell
-#			var index = coordinates.x + coordinates.z * grid.width + coordinates.z / 2
-#			print( index )
-#			var cell = grid.cells[index]
-#			map_editor.edit_cell(cell)
-#			cell.color = Color.magenta
-#			cell.color = $HexMapEditor.color
-
-#			print( "Cell pos -> " + cell.coordinate.to_string() )
-#			for i in HexDirection.values():
-#				if cell.neighbors[i] != null:
-#					cell.neighbors[i].color = Color.magenta
-#					print( "N -> " + cell.neighbors[i].coordinate.to_string() )
-#				else:
-#					print( "N -> null")
-#			hex_mesh.triangulate( cells )
-#			grid.update()
+#				edit_cells(cell)
+#		elif selected_cell != null:
+#			var cell = get_cell_under_cursor( event.position )
+#			if selected_cell != cell and last_searched != cell:
+#				grid.find_path( selected_cell, cell, 14 )
+#				last_searched = cell
+	if event.is_action_pressed("toggle_edit_mode"):
+		map_editor.edit_enabled  = !map_editor.edit_enabled
+		map_editor.visible = map_editor.edit_enabled

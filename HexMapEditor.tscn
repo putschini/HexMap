@@ -7,9 +7,28 @@ anchor_right = 1.0
 anchor_bottom = 1.0
 script = ExtResource( 1 )
 
+[node name="Control7" type="Control" parent="."]
+margin_right = 70.0
+margin_bottom = 43.0
+
+[node name="Label" type="Label" parent="Control7"]
+margin_left = 2.0
+margin_top = 7.0
+margin_right = 74.0
+margin_bottom = 22.0
+text = "Enable Edit"
+
+[node name="EditCheck" type="CheckBox" parent="Control7"]
+margin_left = 19.0
+margin_top = 19.0
+margin_right = 47.0
+margin_bottom = 45.0
+
 [node name="Control" type="Control" parent="."]
-margin_right = 40.0
-margin_bottom = 40.0
+margin_left = 1.0
+margin_top = 46.0
+margin_right = 41.0
+margin_bottom = 86.0
 
 [node name="ColorSelector" type="ItemList" parent="Control"]
 margin_right = 72.0
@@ -17,10 +36,10 @@ margin_bottom = 103.0
 items = [ "None", null, false, "White", null, false, "Yellow", null, false, "Green", null, false, "Blue", null, false ]
 
 [node name="Control2" type="Control" parent="."]
-margin_left = 3.0
-margin_top = 105.0
-margin_right = 43.0
-margin_bottom = 145.0
+margin_left = 4.0
+margin_top = 151.0
+margin_right = 44.0
+margin_bottom = 191.0
 
 [node name="ElevationCheckBox" type="CheckBox" parent="Control2"]
 margin_right = 24.0
@@ -42,9 +61,10 @@ max_value = 5.0
 rounded = true
 
 [node name="Control3" type="Control" parent="."]
-margin_top = 206.0
-margin_right = 88.0
-margin_bottom = 253.0
+margin_left = 1.0
+margin_top = 252.0
+margin_right = 89.0
+margin_bottom = 299.0
 
 [node name="RiverSelector" type="ItemList" parent="Control3"]
 margin_left = 1.0
@@ -61,10 +81,10 @@ margin_bottom = 24.0
 text = "Rivers"
 
 [node name="Control5" type="Control" parent="."]
-margin_left = 1.0
-margin_top = 303.0
-margin_right = 89.0
-margin_bottom = 350.0
+margin_left = 2.0
+margin_top = 349.0
+margin_right = 90.0
+margin_bottom = 396.0
 
 [node name="RoadSelector" type="ItemList" parent="Control5"]
 margin_left = 1.0
@@ -81,10 +101,10 @@ margin_bottom = 24.0
 text = "Roads"
 
 [node name="Control4" type="Control" parent="."]
-margin_left = 5.0
-margin_top = 155.0
-margin_right = 47.0
-margin_bottom = 200.0
+margin_left = 6.0
+margin_top = 201.0
+margin_right = 48.0
+margin_bottom = 246.0
 
 [node name="Label" type="Label" parent="Control4"]
 margin_left = 3.0
@@ -102,9 +122,10 @@ max_value = 5.0
 rounded = true
 
 [node name="Control6" type="Control" parent="."]
-margin_top = 400.0
-margin_right = 40.0
-margin_bottom = 440.0
+margin_left = 1.0
+margin_top = 446.0
+margin_right = 41.0
+margin_bottom = 486.0
 
 [node name="Label" type="Label" parent="Control6"]
 margin_left = 6.0
@@ -121,6 +142,7 @@ margin_right = 75.0
 margin_bottom = 86.0
 items = [ "---", null, false, "add", null, false, "remove", null, false ]
 
+[connection signal="toggled" from="Control7/EditCheck" to="." method="_on_edit_toggled"]
 [connection signal="item_selected" from="Control/ColorSelector" to="." method="_on_selected_color_change"]
 [connection signal="toggled" from="Control2/ElevationCheckBox" to="." method="_on_edit_elevation_toggled"]
 [connection signal="value_changed" from="Control2/ElevationSlider" to="." method="_on_elevation_value_changed"]
