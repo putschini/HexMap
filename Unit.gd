@@ -26,13 +26,22 @@ func _physics_process(delta):
 #			print("Move")
 			var next = path.pop_front()
 			next_stop = next.center
-			var direction = translation.direction_to(next_stop)
-#			print(direction)
-			$MeshInstance.look_at(translation + direction + Vector3(0,height,0), Vector3.UP)
-			velocity.x = direction.x * speed_move
-			velocity.z = direction.z * speed_move
-	velocity = move_and_slide(velocity, Vector3.UP)
-	if translation.distance_to(next_stop) < 0.05:
+#			velocity.y = 0
+	if next_stop != Vector3.ZERO:
+		var direction = translation.direction_to(next_stop)
+#		print(next_stop)
+#		print(direction)
+#		$MeshInstance.look_at(translation + direction + Vector3(0,height,0), Vector3.UP)
+		$MeshInstance.look_at(translation + Vector3(direction.x, height, direction.z), Vector3.UP)
+		velocity.x = direction.x * speed_move
+		velocity.z = direction.z * speed_move
+		velocity.y = direction.y
+		if velocity.y < 0:
+			velocity.y = - 10 #direction.y * speed_move
+		else:
+			velocity.y = 0
+		velocity = move_and_slide(velocity, Vector3.UP)
+	if translation.distance_to(next_stop) < 0.5:
 #		print(translation)
 #		print(next_stop)
 		translation = next_stop

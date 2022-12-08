@@ -104,6 +104,12 @@ func get_cell(var coordinate: HexCoordinate) -> HexCell:
 #	var index = cell_local_x + cell_local_z * HexMetrics.chunk_size_x + floor(coordinate.z / 2)
 #	return chunks[chunk_x + chunk_z * HexMetrics.chunk_count_x].cells[index]
 
+func clear_highlights() -> void:
+	for cell in cells:
+		if cell.highlight_enabled:
+			cell.disable_highlight()
+			cell.needs_update()
+
 func find_path(var from: HexCell, var to: HexCell, var speed: int) -> Array:
 	for cell in cells:
 		cell.distance = cell.coordinate.distance_to(from.coordinate) * 5 + 1
@@ -127,10 +133,10 @@ func find_path(var from: HexCell, var to: HexCell, var speed: int) -> Array:
 			result.push_front(to)
 			current = current.path_from
 			while current != null:
-				if current == from:
-					break
-				if  current == to:
-					continue
+#				if current == from:
+#					break
+#				if  current == to:
+#					continue
 				current.enable_highlight(Color.yellow + Color(current.turn * 0.2, current.turn * 0.2, current.turn * 0.2) )
 				result.push_front(current)
 				current = current.path_from

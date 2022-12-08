@@ -60,6 +60,9 @@ func _input(event):
 					if selected_cell.unit != null and cell.unit == null:
 						if not grid.move_unit(selected_cell, cell):
 							print("Notice: Path Not found")
+						else:
+							grid.clear_highlights()
+							selected_cell = null
 					else:
 						grid.find_path( selected_cell, cell, 14 )
 				else:
